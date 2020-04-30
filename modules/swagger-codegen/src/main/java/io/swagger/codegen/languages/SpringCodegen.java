@@ -7,6 +7,8 @@ import io.swagger.codegen.languages.features.BeanValidationFeatures;
 import io.swagger.models.Operation;
 import io.swagger.models.Path;
 import io.swagger.models.Swagger;
+import io.swagger.models.properties.Property;
+import io.swagger.models.properties.StringProperty;
 
 import java.io.File;
 import java.io.IOException;
@@ -243,6 +245,7 @@ public class SpringCodegen extends AbstractJavaCodegen implements BeanValidation
             typeMapping.put("date", "LocalDate");
             typeMapping.put("DateTime", "OffsetDateTime");
             importMapping.put("LocalDate", "java.time.LocalDate");
+            importMapping.put("LocalTime", "java.time.LocalTime");
             importMapping.put("OffsetDateTime", "java.time.OffsetDateTime");
         } else if (this.async) {
             additionalProperties.put(RESPONSE_WRAPPER, "Callable");
@@ -287,6 +290,14 @@ public class SpringCodegen extends AbstractJavaCodegen implements BeanValidation
                 writer.write(fragment.execute().replaceAll("\\r|\\n", ""));
             }
         });
+    }
+
+    @Override
+    public String getSwaggerType(Property p) {
+        if (p instanceof StringProperty && "time".equals(p.getFormat())) {
+            return "LocalTime";
+        }
+        return super.getSwaggerType(p);
     }
 
     @Override
